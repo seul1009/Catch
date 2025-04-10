@@ -1,0 +1,112 @@
+# Spring Boot
+/target/
+!.mvn/
+.gradle
+/.mvn/
+*.properties
+/application.yml
+
+*.log
+*.debug
+*.error
+
+HELP.md
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iml
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# OS 파일
+.DS_Store
+Thumbs.db
+
+*.env
+
+# dependencies
+/src/main/frontend/node_modules
+/src/main/frontend/.pnp
+/src/main/frontend.pnp.js
+
+# testing
+/src/main/frontend/coverage
+
+# production
+/src/main/frontend/build
+
+# 환경 설정 파일
+/src/main/frontend/*.env
+
+# misc
+/src/main/frontend/.DS_Store
+/src/main/frontend/.env.local
+/src/main/frontend/.env.development.local
+/src/main/frontend/.env.test.local
+/src/main/frontend/.env.production.local
+!/src/main/frontend/src/
+!/src/main/frontend/public/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# MacOS 관련 파일
+.AppleDouble
+.LSOverride
+.Icon?
+
+# Windows 관련 파일
+ehthumbs.db
+Desktop.ini
+
+# Linux 관련 파일
+*~
+.directory
+
+# npm 관련 파일
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.npm/
+.yarn/
+
+# React 빌드 관련 파일
+/build/
+
+# Spring Boot 관련 로그 파일
+*.class
+
+
+
+

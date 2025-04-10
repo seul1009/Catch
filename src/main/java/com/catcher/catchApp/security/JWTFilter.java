@@ -1,0 +1,67 @@
+package com.catcher.catchApp.security;
+
+import com.catcher.catchApp.model.User;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+
+@RequiredArgsConstructor
+public class JWTFilter extends OncePerRequestFilter {
+
+    private final JWTUtil jwtUtil;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        // request에서 Authorization 헤더 찾음
+        String authorization = request.getHeader("Authorization");
+
+        String requestURI = request.getRequestURI();
+        if (requestURI.equals("/signup") || requestURI.equals("/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Authorization 헤더 검증
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);  // 토큰이 없으면 다음 필터로 전달
+            return;
+        }
+
+        String token = authorization.split(" ")[1];
+
+        // 토큰 만료 확인
+        if (jwtUtil.isTokenExpired(token)) {
+            System.out.println("token expired");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 유효한 loginId와 role 추출
+        String username = jwtUtil.extractUsername(token);
+
+        // User 객체 생성
+        User user = new User();
+        user.setUsername(username);
+
+        // CustomUserDetails 객체 생성
+        CustomUserDetails customUserDetails = new CustomUserDetails(user);
+
+        // 인증 토큰 생성
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null);
+
+        // SecurityContext에 인증 정보 설정
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        // 다음 필터로 요청과 응답을 전달
+        filterChain.doFilter(request, response);
+    }
+}
