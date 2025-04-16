@@ -15,5 +15,6 @@ public interface UserService {
 
     User getUserByUsername(String username);
 
+    String findOrCreateKakaoUser(String kakaoId, String nickname, String email);
 }
 

@@ -26,7 +26,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             ObjectMapper objectMapper = new ObjectMapper();
             LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
 
-            String loginId = loginRequest.getUsername();
+            String loginId = loginRequest.getEmail();
             String password = loginRequest.getPassword();
 
             System.out.println("사용자 인증: " + loginId);
