@@ -1,9 +1,11 @@
 package com.catcher.catchApp.controller;
 
+import com.catcher.catchApp.dto.AuthTokens;
+import com.catcher.catchApp.dto.KakaoLoginRequest;
 import com.catcher.catchApp.dto.LoginRequest;
 import com.catcher.catchApp.dto.SignupRequest;
 import com.catcher.catchApp.security.JWTUtil;
-import com.catcher.catchApp.service.EmailService;
+import com.catcher.catchApp.service.KakaoLoginService;
 import com.catcher.catchApp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +14,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -28,6 +32,7 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final UserService userService;
+    private final KakaoLoginService kakaoLoginService;
 
 
     @PostMapping("/signup")
@@ -55,20 +60,38 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
 
         try {
-            System.out.println("로그인 시도: " + loginRequest.getUsername());
+            System.out.println("로그인 시도: " + loginRequest.getEmail());
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+                    new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
 
             String token = jwtUtil.generateToken(authentication.getName()); // 토큰 생성
+            System.out.println(token);
 
-            Map<String, String> response = new HashMap<>();
-            response.put("token", token);
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of("token", token));
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: 아이디 또는 비밀번호 오류");
         }
     }
+
+    @PostMapping("/kakao")
+    public ResponseEntity<?> kakaoLogin(@RequestBody KakaoLoginRequest request) {
+        try {
+            AuthTokens tokens = kakaoLoginService.login(request);
+            return ResponseEntity.ok(tokens);
+        } catch (IllegalArgumentException e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "카카오 로그인 실패");
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "서버 오류");
+            error.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
 
 }

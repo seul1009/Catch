@@ -11,7 +11,7 @@ public class SignupRequest {
 
 
     @NotBlank(message = "비밀번호를 입력해 주세요.")
-    @Pattern(regexp = "(?=.*[a-z])(?=.*[0-9])[a-z0-9A-Za-z0-9!@#$%^&*]{8,16}$", message = "비밀번호는 8~16자 영문 소문자, 숫자를 포함해야 합니다.")
+    @Pattern(regexp = "(?=.*[a-z])(?=.*[0-9])[a-z0-9A-Za-z0-9!@#$%^&*]{6,16}$", message = "비밀번호는 6~16자 영문 소문자, 숫자를 포함해야 합니다.")
     private String password;
 
 }
