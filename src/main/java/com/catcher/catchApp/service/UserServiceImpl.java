@@ -16,18 +16,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
 
-    public UserServiceImpl(UserRepository userRepository, EmailService emailService) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
-        this.emailService = emailService;
     }
 
 
     @Override
     public boolean signup(SignupRequest signupRequest) {
-        if (userRepository.existsByUsername(signupRequest.getEmail())) {
+        if (userRepository.existsByEmail(signupRequest.getEmail())) {
             return false;
         }
 
@@ -41,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(LoginRequest loginRequest) {
-        User user = userRepository.findByUsername(loginRequest.getEmail())
+        User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않는 이메일입니다."));
         System.out.println(user.getEmail());
         System.out.println(user.getPassword());
@@ -54,10 +52,9 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    //username으로 조회
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("해당 이용자를 찾을 수 없습니다: " + username));
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("해당 이용자를 찾을 수 없습니다: " + email));
     }
 
     public String findOrCreateKakaoUser(String kakaoId, String nickname, String email) {

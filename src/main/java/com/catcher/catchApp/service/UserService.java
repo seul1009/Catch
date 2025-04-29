@@ -6,14 +6,11 @@ import com.catcher.catchApp.model.User;
 
 public interface UserService {
 
-    // 로그인 처리
     User login(LoginRequest loginRequest);
 
-    // 회원가입 처리
     boolean signup(SignupRequest signupRequest);
 
-
-    User getUserByUsername(String username);
+    User getUserByEmail(String email);
 
     String findOrCreateKakaoUser(String kakaoId, String nickname, String email);
 }
