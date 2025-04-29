@@ -9,8 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class APIController {
 
     private final UserServiceImpl userServiceImpl;
+
     @Value("${JWT_SECRET_KEY}")
     private String secretKey;
 
@@ -61,11 +63,5 @@ public class APIController {
         }
     }
 
-    @GetMapping("/info")
-    public ResponseEntity<User> getInfo(Authentication authentication) {
-        String username = authentication.getName();
-        User user = userServiceImpl.getUserByUsername(username);
-        return ResponseEntity.ok(user);
-    }
 }
 

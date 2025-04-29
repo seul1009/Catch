@@ -1,11 +1,8 @@
 package com.catcher.catchApp.controller;
 
-import com.catcher.catchApp.dto.AuthTokens;
-import com.catcher.catchApp.dto.KakaoLoginRequest;
 import com.catcher.catchApp.dto.LoginRequest;
 import com.catcher.catchApp.dto.SignupRequest;
 import com.catcher.catchApp.security.JWTUtil;
-import com.catcher.catchApp.service.KakaoLoginService;
 import com.catcher.catchApp.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +29,6 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final UserService userService;
-    private final KakaoLoginService kakaoLoginService;
 
 
     @PostMapping("/signup")
@@ -71,27 +67,8 @@ public class UserController {
             return ResponseEntity.ok(Map.of("token", token));
 
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: 아이디 또는 비밀번호 오류");
         }
     }
-
-    @PostMapping("/kakao")
-    public ResponseEntity<?> kakaoLogin(@RequestBody KakaoLoginRequest request) {
-        try {
-            AuthTokens tokens = kakaoLoginService.login(request);
-            return ResponseEntity.ok(tokens);
-        } catch (IllegalArgumentException e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "카카오 로그인 실패");
-            error.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
-        } catch (Exception e) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "서버 오류");
-            error.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
-    }
-
-
 }
