@@ -2,8 +2,8 @@ package com.catcher.catchApp.service;
 
 import com.catcher.catchApp.dto.LoginRequest;
 import com.catcher.catchApp.dto.SignupRequest;
-import com.catcher.catchApp.repository.UserRepository;
 import com.catcher.catchApp.model.User;
+import com.catcher.catchApp.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,19 +57,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("해당 이용자를 찾을 수 없습니다: " + email));
     }
 
-    public String findOrCreateKakaoUser(String kakaoId, String nickname, String email) {
-        Optional<User> userOpt = userRepository.findByKakaoId(kakaoId);
-        if (userOpt.isPresent()) return userOpt.get().getUsername();
-
-        User newUser = new User();
-        newUser.setKakaoId(kakaoId);
-        newUser.setUsername("kakao_" + kakaoId);
-        newUser.setNickname(nickname);
-        newUser.setEmail(email);
-
-        userRepository.save(newUser);
-        return newUser.getUsername();
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
-
-
 }

@@ -2,6 +2,7 @@ package com.catcher.catchApp.controller;
 
 import com.catcher.catchApp.dto.LoginRequest;
 import com.catcher.catchApp.dto.SignupRequest;
+import com.catcher.catchApp.security.CustomUserDetails;
 import com.catcher.catchApp.security.JWTUtil;
 import com.catcher.catchApp.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -61,8 +63,16 @@ public class UserController {
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
 
-            String token = jwtUtil.generateToken(authentication.getName()); // 토큰 생성
-            System.out.println(token);
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String email = userDetails.getMember().getEmail();
+
+            String roles = userDetails.getAuthorities().stream()
+                    .findFirst()
+                    .map(GrantedAuthority::getAuthority)
+                    .orElse("ROLE_USER");
+
+            String token = jwtUtil.generateToken(email, roles);
+            System.out.println("JWT: " + token);
 
             return ResponseEntity.ok(Map.of("token", token));
 
@@ -71,4 +81,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: 아이디 또는 비밀번호 오류");
         }
     }
+
+
+
+
 }

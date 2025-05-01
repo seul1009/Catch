@@ -18,9 +18,10 @@ public class JWTUtil {
     private final long EXPIRATION_TIME = 86400000; // 24시간
 
     // JWT 생성 (사용자명, 역할, 만료 시간)
-    public String generateToken(String username) {
+    public String generateToken(String email, String roles) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(email)
+                .claim("roles", roles)
                 .setIssuedAt(new Date())  // 토큰 발급 시간
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))  // 만료 시간
                 .signWith(SignatureAlgorithm.HS256, secretKey)  // 서명 방식 설정
@@ -33,6 +34,14 @@ public class JWTUtil {
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String getEmailFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token.replace("Bearer ", ""))
+                .getBody()
+                .getSubject(); // subject에 이메일 저장한 경우
     }
 
     // 토큰 만료 여부 확인

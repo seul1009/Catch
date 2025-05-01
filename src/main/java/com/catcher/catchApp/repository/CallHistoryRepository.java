@@ -1,4 +1,7 @@
 package com.catcher.catchApp.repository;
 
-public class CallHistoryRepository {
+import com.catcher.catchApp.entity.CallHistory;
+import org.springframework.data.mongodb.repository.MongoRepository;
+
+public interface CallHistoryRepository extends MongoRepository<CallHistory, String> {
 }
