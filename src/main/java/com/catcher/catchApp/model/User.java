@@ -21,12 +21,6 @@ public class User {
 
     private int phishingCount = 0;
 
-    private LoginType loginType; // 일반, 카카오 구분
-
-    private String kakaoId;
-
-    private String nickname;
-
     private String email;
 
 }

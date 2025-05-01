@@ -21,11 +21,10 @@ public class JWTFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // request에서 Authorization 헤더 찾음
         String authorization = request.getHeader("Authorization");
 
         String requestURI = request.getRequestURI();
-        if (requestURI.equals("/signup") || requestURI.equals("/login")) {
+        if (requestURI.startsWith("/auth/signup") || requestURI.startsWith("/auth/login")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,7 +55,7 @@ public class JWTFilter extends OncePerRequestFilter {
         CustomUserDetails customUserDetails = new CustomUserDetails(user);
 
         // 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null);
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities() );
 
         // SecurityContext에 인증 정보 설정
         SecurityContextHolder.getContext().setAuthentication(authToken);

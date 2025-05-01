@@ -4,6 +4,8 @@ import com.catcher.catchApp.dto.LoginRequest;
 import com.catcher.catchApp.dto.SignupRequest;
 import com.catcher.catchApp.model.User;
 
+import java.util.Optional;
+
 public interface UserService {
 
     User login(LoginRequest loginRequest);
@@ -12,6 +14,7 @@ public interface UserService {
 
     User getUserByEmail(String email);
 
-    String findOrCreateKakaoUser(String kakaoId, String nickname, String email);
+    Optional<User> findByEmail(String email);
+
 }
 
