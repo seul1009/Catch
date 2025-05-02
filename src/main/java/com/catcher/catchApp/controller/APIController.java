@@ -58,7 +58,6 @@ public class APIController {
                 if (userOpt.isPresent()) {
                     User user = userOpt.get();
                     int phishingCount = user.getPhishingCount();
-                    System.out.println(phishingCount);
                     return ResponseEntity.ok(String.valueOf(phishingCount));  // 데이터를 반환
                 } else {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저를 찾을 수 없습니다.");
