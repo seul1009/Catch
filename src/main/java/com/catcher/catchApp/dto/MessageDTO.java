@@ -8,4 +8,12 @@ public class MessageDTO {
         this.sender = sender;
         this.content = content;
     }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public String getContent() {
+        return content;
+    }
 }
