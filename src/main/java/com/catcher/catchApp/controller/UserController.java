@@ -1,7 +1,9 @@
 package com.catcher.catchApp.controller;
 
 import com.catcher.catchApp.dto.LoginRequest;
+import com.catcher.catchApp.dto.ResetPasswordRequest;
 import com.catcher.catchApp.dto.SignupRequest;
+import com.catcher.catchApp.repository.UserRepository;
 import com.catcher.catchApp.security.CustomUserDetails;
 import com.catcher.catchApp.security.JWTUtil;
 import com.catcher.catchApp.service.UserService;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,7 +32,8 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JWTUtil jwtUtil;
     private final UserService userService;
-
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest request) {
@@ -76,6 +80,18 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: 아이디 또는 비밀번호 오류");
         }
+    }
+
+
+    @PostMapping("/reset")
+    public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+        boolean success = userService.resetPassword(request.getEmail(), request.getNewPassword());
+
+        if (!success) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("가입되지 않은 이메일입니다.");
+        }
+
+        return ResponseEntity.ok("비밀번호가 성공적으로 재설정되었습니다.");
     }
 
     @DeleteMapping

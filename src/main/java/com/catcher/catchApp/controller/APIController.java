@@ -70,8 +70,6 @@ public class APIController {
         }
     }
 
-
-
     @GetMapping("/report")
     public ResponseEntity<String> getReportInfo() {
         return ResponseEntity.ok("신고 관련 데이터입니다.");

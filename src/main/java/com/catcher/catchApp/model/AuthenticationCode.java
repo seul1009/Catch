@@ -15,7 +15,6 @@ import java.util.Date;
 public class AuthenticationCode {
     @Id
     private String id;
-
     private String email;
     private String code;
 

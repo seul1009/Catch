@@ -18,5 +18,6 @@ public interface UserService {
 
     void deleteUserByEmail(String email);
 
+    boolean resetPassword(String email, String newPassword);
 }
 

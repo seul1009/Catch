@@ -38,7 +38,7 @@ public class EmailService {
 
         String msg="";
         msg += "<h1 style=\"font-size: 30px; padding-right: 30px; padding-left: 30px;\">이메일 주소 확인</h1>";
-        msg += "<p style=\"font-size: 17px; padding-right: 30px; padding-left: 30px;\">아래 확인 코드를 회원가입 화면에서 입력해주세요.</p>";
+        msg += "<p style=\"font-size: 17px; padding-right: 30px; padding-left: 30px;\">아래 이메일 인증 코드를 회원가입 화면에서 입력해주세요.</p>";
         msg += "<div style=\"padding-right: 30px; padding-left: 30px; margin: 32px 0 40px;\"><table style=\"border-collapse: collapse; border: 0; height: 70px; table-layout: fixed; word-wrap: break-word; border-radius: 6px;\"><tbody><tr><td style=\"text-align: center; vertical-align: middle; font-size: 30px;\">";
         msg += ePw;
         msg += "</td></tr></tbody></table></div>";
@@ -82,7 +82,14 @@ public class EmailService {
         Optional<AuthenticationCode> optionalAuthCode = authenticationCodeRepository.findByEmail(email);
 
         return optionalAuthCode
-                .map(authCode -> authCode.getCode().equals(inputCode))
-                .orElse(false); // 인증 코드가 없으면 false 반환
+                .filter(authCode -> authCode.getCode().equals(inputCode))
+                .filter(authCode -> {
+                    long now = System.currentTimeMillis();
+                    long created = authCode.getCreatedAt().getTime();
+                    long elapsedMinutes = (now - created) / 1000 / 60;
+
+                    return elapsedMinutes <= 5; // 인증 코드 유효기간 5분
+                })
+                .isPresent();
     }
 }
