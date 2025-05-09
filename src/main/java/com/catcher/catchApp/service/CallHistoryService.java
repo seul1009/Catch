@@ -5,6 +5,7 @@ import com.catcher.catchApp.dto.MessageDTO;
 import com.catcher.catchApp.entity.CallHistory;
 import com.catcher.catchApp.repository.CallHistoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,8 @@ public class CallHistoryService {
     private final CallHistoryRepository callHistoryRepository;
 
     public List<CallHistoryResponse> getAllHistories() {
-        return callHistoryRepository.findAll().stream()
+        Sort sort = Sort.by(Sort.Direction.DESC, "date"); // 일자별로 내림차순
+        return callHistoryRepository.findAll(sort).stream()
                 .map(h -> new CallHistoryResponse(
                         h.getId(), h.getDate(), h.getPhoneNumber(), h.getVishingPercent()
                 ))
