@@ -1,14 +1,15 @@
 package com.catcher.catchApp.security;
 
-import com.catcher.catchApp.model.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.io.IOException;
 public class JWTFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -47,15 +49,21 @@ public class JWTFilter extends OncePerRequestFilter {
         // 유효한 loginId와 role 추출
         String username = jwtUtil.extractUsername(token);
 
-        // User 객체 생성
-        User user = new User();
-        user.setUsername(username);
+//        // User 객체 생성
+//        User user = new User();
+//        user.setUsername(username);
+//
+//        // CustomUserDetails 객체 생성
+//        CustomUserDetails customUserDetails = new CustomUserDetails(user);
+//
+//        // 인증 토큰 생성
+//        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities() );
 
-        // CustomUserDetails 객체 생성
-        CustomUserDetails customUserDetails = new CustomUserDetails(user);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        // 인증 토큰 생성
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities() );
+        // ✅ CustomUserDetails 객체로 인증 처리
+        Authentication authToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
         // SecurityContext에 인증 정보 설정
         SecurityContextHolder.getContext().setAuthentication(authToken);
