@@ -7,6 +7,7 @@ import com.catcher.catchApp.repository.UserRepository;
 import com.catcher.catchApp.security.CustomUserDetails;
 import com.catcher.catchApp.security.JWTUtil;
 import com.catcher.catchApp.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -37,22 +36,12 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest request) {
-        try {
-            boolean isSignedUp = userService.signup(request);
+        boolean isSignedUp = userService.signup(request);
 
-            if (isSignedUp) {
-                return ResponseEntity.ok().body("회원가입이 성공적으로 완료되었습니다.");
-            } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("success", false);
-                response.put("message", "이미 가입된 이메일입니다.");
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-            }
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", "회원가입 처리 중 오류가 발생했습니다: " + e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+        if (isSignedUp) {
+            return ResponseEntity.ok().body("회원가입이 성공적으로 완료되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 가입된 이메일입니다.");
         }
     }
 
