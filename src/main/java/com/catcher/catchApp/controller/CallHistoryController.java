@@ -2,12 +2,13 @@ package com.catcher.catchApp.controller;
 
 import com.catcher.catchApp.dto.CallHistoryResponse;
 import com.catcher.catchApp.dto.MessageDTO;
+import com.catcher.catchApp.entity.CallHistory;
+import com.catcher.catchApp.security.CustomUserDetails;
 import com.catcher.catchApp.service.CallHistoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -19,9 +20,16 @@ public class CallHistoryController {
 
     private final CallHistoryService callHistoryService;
 
+    @PostMapping
+    public ResponseEntity<?> saveCallHistory(@RequestBody CallHistory callHistory, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        callHistoryService.saveCallHistory(callHistory, userDetails);
+        return ResponseEntity.ok("저장 완료");
+    }
+
     @GetMapping
-    public List<CallHistoryResponse> getHistories() {
-        return callHistoryService.getAllHistories();
+    public List<CallHistoryResponse> getUserHistories(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        String userId = userDetails.getUsername();
+        return callHistoryService.getHistoriesByUserId(userId);
     }
 
     @GetMapping("/{id}")
