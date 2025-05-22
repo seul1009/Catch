@@ -2,22 +2,19 @@ package com.catcher.catchApp.controller;
 
 import com.catcher.catchApp.model.User;
 import com.catcher.catchApp.repository.UserRepository;
+import com.catcher.catchApp.security.CustomUserDetails;
 import com.catcher.catchApp.security.JWTUtil;
 import com.catcher.catchApp.service.CallHistoryService;
 import com.catcher.catchApp.service.UserService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 
 @RestController
@@ -41,33 +38,14 @@ public class APIController {
     }
 
     @GetMapping("/home")
-    public ResponseEntity<String> getHome(HttpServletRequest request) {
-        String token = request.getHeader("Authorization");
-        System.out.println("token: "+ token);
-        if (token != null && token.startsWith("Bearer ")) {
-            try {
-                String jwtToken = token.substring(7);  // "Bearer " 제거
-                Claims claims = Jwts.parser()
-                        .setSigningKey(secretKey)
-                        .parseClaimsJws(jwtToken)
-                        .getBody();
-
-                String email = claims.getSubject();
-                Optional<User> userOpt = userRepository.findByEmail(email);
-
-                if (userOpt.isPresent()) {
-                    User user = userOpt.get();
-                    int phishingCount = user.getPhishingCount();
-                    return ResponseEntity.ok(String.valueOf(phishingCount));  // 데이터를 반환
-                } else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유저를 찾을 수 없습니다.");
-                }
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
-            }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authorization 헤더가 없거나, 형식이 잘못되었습니다.");
+    public ResponseEntity<String> getHome(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증 필요");
         }
+
+        String email = userDetails.getUsername();
+        int phishingCount = userService.getPhishingCountByEmail(email);
+        return ResponseEntity.ok(String.valueOf(phishingCount));
     }
 
     @GetMapping("/report")

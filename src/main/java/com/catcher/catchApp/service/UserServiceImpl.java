@@ -53,6 +53,11 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    public int getPhishingCountByEmail(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        return userOpt.map(User::getPhishingCount).orElse(0);
+    }
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("해당 이용자를 찾을 수 없습니다: " + email));
