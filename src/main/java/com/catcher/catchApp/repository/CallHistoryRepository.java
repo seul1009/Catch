@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CallHistoryRepository extends MongoRepository<CallHistory, String> {
     List<CallHistory> findAllByUserIdOrderByDateDesc(String userId);
+
+    long countByUserIdAndVishingPercentGreaterThan(String userId, int percent);
 }

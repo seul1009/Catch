@@ -16,8 +16,9 @@ public class JWTUtil {
     @Value("${JWT_SECRET_KEY}")
     private String secretKey;  // JWT 서명 키
     private final long EXPIRATION_TIME = 86400000; // 24시간
+//    private final long EXPIRATION_TIME = 10000; // 테스트
 
-    // JWT 생성 (사용자명, 역할, 만료 시간)a
+    // JWT 생성 (사용자명, 역할, 만료 시간)
     public String generateToken(String email, String roles) {
         return Jwts.builder()
                 .setSubject(email)
@@ -52,7 +53,19 @@ public class JWTUtil {
 
     // 토큰 만료 여부 확인
     public boolean isTokenExpired(String token) {
-        return extractClaims(token).getExpiration().before(new Date());
+        try {
+            Date expiration = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getExpiration();
+
+            return expiration.before(new Date());
+        } catch (ExpiredJwtException e) {
+            return true; //  만료된 경우 명시적으로 true
+        } catch (Exception e) {
+            return true; //  기타 에러도 만료 처리
+        }
     }
 
     // JWT에서 사용자 이름 추출
@@ -60,9 +73,9 @@ public class JWTUtil {
         return extractClaims(token).getSubject();
     }
 
-    // JWT에서 역할(role) 추출
+    // JWT에서 역할(roles) 추출
     public String extractRole(String token) {
-        return extractClaims(token).get("role", String.class);  // "role" 클레임 추출
+        return extractClaims(token).get("roles", String.class);
     }
 
     // JWT 유효성 검증

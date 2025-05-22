@@ -7,12 +7,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
@@ -24,8 +27,8 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String authorization = request.getHeader("Authorization");
-
         String requestURI = request.getRequestURI();
+
         if (requestURI.startsWith("/auth/signup") || requestURI.startsWith("/auth/login")) {
             filterChain.doFilter(request, response);
             return;
@@ -46,27 +49,29 @@ public class JWTFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 유효한 loginId와 role 추출
         String username = jwtUtil.extractUsername(token);
-
-//        // User 객체 생성
-//        User user = new User();
-//        user.setUsername(username);
-//
-//        // CustomUserDetails 객체 생성
-//        CustomUserDetails customUserDetails = new CustomUserDetails(user);
-//
-//        // 인증 토큰 생성
-//        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities() );
-
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        // ✅ CustomUserDetails 객체로 인증 처리
-        Authentication authToken =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        String roles = jwtUtil.extractClaims(token).get("roles", String.class);
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(roles);
+
+        // CustomUserDetails 객체로 인증 처리
+        Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
         // SecurityContext에 인증 정보 설정
         SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        // 토큰 만료 5분 이내이면 새 토큰 발급
+        long expireTime = jwtUtil.extractClaims(token).getExpiration().getTime();
+        long currentTime = System.currentTimeMillis();
+        long timeRemaining = expireTime - currentTime;
+
+
+//            if (timeRemaining < 1 * 1000) // 테스트
+        if (timeRemaining < 5 * 60 * 1000) { // 5분 미만
+            String newToken = jwtUtil.generateToken(username, roles);
+            response.setHeader("New-Token", newToken);
+        }
 
         // 다음 필터로 요청과 응답을 전달
         filterChain.doFilter(request, response);
