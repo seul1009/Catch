@@ -1,9 +1,9 @@
 package com.catcher.catchApp.security;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -17,7 +17,7 @@ public class JWTUtil {
     private String secretKey;  // JWT 서명 키
     private final long EXPIRATION_TIME = 86400000; // 24시간
 
-    // JWT 생성 (사용자명, 역할, 만료 시간)
+    // JWT 생성 (사용자명, 역할, 만료 시간)a
     public String generateToken(String email, String roles) {
         return Jwts.builder()
                 .setSubject(email)
@@ -30,10 +30,16 @@ public class JWTUtil {
 
     // JWT에서 클레임 추출
     public Claims extractClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public String getEmailFromToken(String token) {
