@@ -49,7 +49,6 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
 
         try {
-//            System.out.println("로그인 시도: " + loginRequest.getEmail());
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
             );
@@ -63,7 +62,7 @@ public class UserController {
                     .orElse("ROLE_USER");
 
             String token = jwtUtil.generateToken(email, roles);
-
+            System.out.println("토큰 생성됨: " + token);
             return ResponseEntity.ok(Map.of("token", token));
 
         } catch (Exception e) {

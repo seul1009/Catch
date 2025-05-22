@@ -33,7 +33,7 @@ public class CallHistoryController {
     }
 
     @GetMapping("/{id}")
-    public Map<String, List<MessageDTO>> getDetail(@PathVariable("id") String id) {
-        return Map.of("messages", callHistoryService.getMessages(id));
+    public Map<String, List<MessageDTO>> getDetail(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return Map.of("messages", callHistoryService.getMessages(id, userDetails));
     }
 }

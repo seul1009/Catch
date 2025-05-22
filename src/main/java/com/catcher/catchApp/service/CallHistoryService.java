@@ -33,9 +33,15 @@ public class CallHistoryService {
                 .collect(Collectors.toList());
     }
 
-    public List<MessageDTO> getMessages(String id) {
+    public List<MessageDTO> getMessages(String id, CustomUserDetails userDetails) {
+        String userEmail = userDetails.getUsername();
+
         CallHistory history = callHistoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Not found"));
+
+        if (!history.getUserId().equals(userEmail)) {
+            throw new SecurityException("접근 권한이 없습니다");
+        }
 
         return history.getMessages().stream()
                 .map(m -> new MessageDTO(m.getSender(), m.getContent()))

@@ -1,10 +1,10 @@
 package com.catcher.catchApp.controller;
 
 import com.catcher.catchApp.model.User;
+import com.catcher.catchApp.repository.CallHistoryRepository;
 import com.catcher.catchApp.repository.UserRepository;
 import com.catcher.catchApp.security.CustomUserDetails;
 import com.catcher.catchApp.security.JWTUtil;
-import com.catcher.catchApp.service.CallHistoryService;
 import com.catcher.catchApp.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -28,13 +28,13 @@ public class APIController {
     private String secretKey;
 
     private final UserRepository userRepository;
-    private final CallHistoryService callHistoryService;
+    private final CallHistoryRepository callHistoryRepository;
 
-    public APIController(UserService userService, JWTUtil jwtUtil, UserRepository userRepository, CallHistoryService callHistoryService) {
+    public APIController(UserService userService, JWTUtil jwtUtil, UserRepository userRepository, CallHistoryRepository callHistoryRepository) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
-        this.callHistoryService = callHistoryService;
+        this.callHistoryRepository = callHistoryRepository;
     }
 
     @GetMapping("/home")
@@ -44,7 +44,9 @@ public class APIController {
         }
 
         String email = userDetails.getUsername();
-        int phishingCount = userService.getPhishingCountByEmail(email);
+        User user = userRepository.findByEmail(email).orElseThrow();
+        long phishingCount = callHistoryRepository.countByUserIdAndVishingPercentGreaterThan(user.getEmail(), 60);
+
         return ResponseEntity.ok(String.valueOf(phishingCount));
     }
 
