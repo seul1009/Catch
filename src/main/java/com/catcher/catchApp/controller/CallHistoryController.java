@@ -36,4 +36,10 @@ public class CallHistoryController {
     public Map<String, List<MessageDTO>> getDetail(@PathVariable("id") String id, @AuthenticationPrincipal CustomUserDetails userDetails) {
         return Map.of("messages", callHistoryService.getMessages(id, userDetails));
     }
+
+    @PostMapping("/flask")
+    public ResponseEntity<?> saveFromFlask(@RequestBody CallHistory callHistory) {
+        callHistoryService.saveFromFlask(callHistory);
+        return ResponseEntity.ok("저장 완료");
+    }
 }
