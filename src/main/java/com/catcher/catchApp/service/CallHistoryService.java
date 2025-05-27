@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,9 +28,13 @@ public class CallHistoryService {
 
     public List<CallHistoryResponse> getHistoriesByUserId(String userId) {
         Sort sort = Sort.by(Sort.Direction.DESC, "date");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         return callHistoryRepository.findAllByUserIdOrderByDateDesc(userId).stream()
                 .map(h -> new CallHistoryResponse(
-                        h.getId(), h.getDate(), h.getPhoneNumber(), h.getVishingPercent()
+                        h.getId(),
+                        h.getDate().format(formatter),
+                        h.getPhoneNumber(),
+                        h.getVishingPercent()
                 ))
                 .collect(Collectors.toList());
     }
@@ -46,5 +52,12 @@ public class CallHistoryService {
         return history.getMessages().stream()
                 .map(m -> new MessageDTO(m.getSender(), m.getContent()))
                 .collect(Collectors.toList());
+    }
+
+    public void saveFromFlask(CallHistory callHistory){
+        if (callHistory.getDate() == null) {
+            callHistory.setDate(LocalDateTime.now());
+        }
+        callHistoryRepository.save(callHistory);
     }
 }

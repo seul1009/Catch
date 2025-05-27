@@ -33,6 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/user/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/call-history/flask").permitAll()
                         .requestMatchers("/api/**").authenticated()  // /api/** 패턴의 요청은 인증 필요
                         .anyRequest().authenticated()  // 나머지 요청은 인증 필요
                 )

@@ -3,8 +3,10 @@ package com.catcher.catchApp.entity;
 import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -15,7 +17,9 @@ public class CallHistory {
     @Id
     private String id;
 
-    private String date;
+    @CreatedDate
+    private LocalDateTime date;
+
     private String phoneNumber;
     private int vishingPercent;
 
