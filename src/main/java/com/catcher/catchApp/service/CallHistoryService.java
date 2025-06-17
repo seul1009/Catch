@@ -22,14 +22,14 @@ public class CallHistoryService {
 
     public void saveCallHistory(CallHistory callHistory, CustomUserDetails userDetails) {
         String userEmail = userDetails.getUsername();
-        callHistory.setUserId(userEmail);
+        callHistory.setEmail(userEmail);
         callHistoryRepository.save(callHistory);
     }
 
-    public List<CallHistoryResponse> getHistoriesByUserId(String userId) {
+    public List<CallHistoryResponse> getHistoriesByEmail(String email) {
         Sort sort = Sort.by(Sort.Direction.DESC, "date");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        return callHistoryRepository.findAllByUserIdOrderByDateDesc(userId).stream()
+        return callHistoryRepository.findAllByEmailOrderByDateDesc(email).stream()
                 .map(h -> new CallHistoryResponse(
                         h.getId(),
                         h.getDate().format(formatter),
@@ -45,7 +45,7 @@ public class CallHistoryService {
         CallHistory history = callHistoryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Not found"));
 
-        if (!history.getUserId().equals(userEmail)) {
+        if (!history.getEmail().equals(userEmail)) {
             throw new SecurityException("접근 권한이 없습니다");
         }
 

@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface CallHistoryRepository extends MongoRepository<CallHistory, String> {
-    List<CallHistory> findAllByUserIdOrderByDateDesc(String userId);
+    List<CallHistory> findAllByEmailOrderByDateDesc(String email);
 
-    long countByUserIdAndVishingPercentGreaterThan(String userId, int percent);
+    long countByEmailAndVishingPercentGreaterThan(String email, int percent);
 }

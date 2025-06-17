@@ -82,7 +82,7 @@ public class UserController {
         return ResponseEntity.ok("비밀번호가 성공적으로 재설정되었습니다.");
     }
 
-    @DeleteMapping
+    @DeleteMapping("/withdraw")
     public ResponseEntity<?> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
         String email = userDetails.getUsername();
 

@@ -28,8 +28,8 @@ public class CallHistoryController {
 
     @GetMapping
     public List<CallHistoryResponse> getUserHistories(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        String userId = userDetails.getUsername();
-        return callHistoryService.getHistoriesByUserId(userId);
+        String email = userDetails.getUsername();
+        return callHistoryService.getHistoriesByEmail(email);
     }
 
     @GetMapping("/{id}")

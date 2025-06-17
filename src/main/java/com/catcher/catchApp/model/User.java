@@ -1,11 +1,9 @@
 package com.catcher.catchApp.model;
 
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,7 +11,7 @@ import java.util.UUID;
 public class User {
 
     @Id
-    private String id = UUID.randomUUID().toString();
+    private String id;
 
     private String username;
 

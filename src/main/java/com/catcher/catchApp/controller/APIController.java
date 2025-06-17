@@ -45,7 +45,7 @@ public class APIController {
 
         String email = userDetails.getUsername();
         User user = userRepository.findByEmail(email).orElseThrow();
-        long phishingCount = callHistoryRepository.countByUserIdAndVishingPercentGreaterThan(user.getEmail(), 60);
+        long phishingCount = callHistoryRepository.countByEmailAndVishingPercentGreaterThan(user.getEmail(), 60);
 
         return ResponseEntity.ok(String.valueOf(phishingCount));
     }

@@ -1,6 +1,6 @@
 package com.catcher.catchApp.entity;
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
@@ -23,7 +23,7 @@ public class CallHistory {
     private String phoneNumber;
     private int vishingPercent;
 
-    private String userId;
+    private String email;
 
     private List<Message> messages;
 
