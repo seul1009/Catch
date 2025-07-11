@@ -73,3 +73,8 @@ Whisper STT: 분리된 화자별 음성을 텍스트로 변환
 ## 시연 영상
 https://github.com/user-attachments/assets/ef2ee696-d539-41ec-bf6b-ab88ca1eea21
 
+https://github.com/user-attachments/assets/9556e113-231d-40b1-b85b-6813ae5bfa25
+
+https://github.com/user-attachments/assets/7efe335d-3361-4ebf-a9a5-97c4d19c05a8
+
+
