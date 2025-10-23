@@ -14,9 +14,9 @@
 <br>
 
 ## Android 지원 버전
-- 최소 지원 Android 버전: Android 7.0 (API 24)
-- 대상 Android 버전: Android 14 (API 35)
-- 컴파일 SDK 버전: Android 14 (API 35)
+- minSdkVersion: 24
+- targetSdkVersion: 35 
+- compileSdkVersion: 35
 <br><br>
 
 ##  주요 기능
