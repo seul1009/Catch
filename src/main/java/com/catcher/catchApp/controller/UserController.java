@@ -5,6 +5,7 @@ import com.catcher.catchApp.dto.ResetPasswordRequest;
 import com.catcher.catchApp.dto.SignupRequest;
 import com.catcher.catchApp.repository.UserRepository;
 import com.catcher.catchApp.security.CustomUserDetails;
+import com.catcher.catchApp.security.CustomUserDetailsService;
 import com.catcher.catchApp.security.JWTUtil;
 import com.catcher.catchApp.service.UserService;
 import jakarta.validation.Valid;
@@ -33,6 +34,7 @@ public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody @Valid SignupRequest request) {
@@ -61,15 +63,47 @@ public class UserController {
                     .map(GrantedAuthority::getAuthority)
                     .orElse("ROLE_USER");
 
-            String token = jwtUtil.generateToken(email, roles);
-            System.out.println("토큰 생성됨: " + token);
-            return ResponseEntity.ok(Map.of("token", token));
+            String accessToken = jwtUtil.generateToken(email, roles);
+            String refreshToken = jwtUtil.generateRefreshToken(email);
+            
+            return ResponseEntity.ok(Map.of(
+                    "accessToken", accessToken,
+                    "refreshToken", refreshToken
+            ));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패: 아이디 또는 비밀번호 오류");
         }
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody Map<String, String> body) {
+
+        String refreshToken = body.get("refreshToken");
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Refresh token required");
+        }
+
+        // Refresh Token 만료 체크
+        if (jwtUtil.isTokenExpired(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token expired");
+        }
+
+        // Refresh Token에서 email 추출
+        String email = jwtUtil.extractUsername(refreshToken);
+
+        CustomUserDetails userDetails =
+                            (CustomUserDetails) customUserDetailsService.loadUserByUsername(email);
+
+        String roles = userDetails.getAuthorities().iterator().next().getAuthority();
+
+        // 새 Access Token 발급
+        String newAccessToken = jwtUtil.generateToken(email, roles);
+
+        return ResponseEntity.ok(Map.of(
+                "accessToken", newAccessToken
+        ));
+    }
 
     @PostMapping("/reset")
     public ResponseEntity<?> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
